@@ -2,6 +2,8 @@ const $ = (id) => document.getElementById(id);
 const form = $("survey");
 const fields = ["participant","date","caffeineMg","lastCaffeine","napMinutes","napEnd","exerciseMinutes","exerciseEnd","fatigue","steps","heartRate","alarmTime","firstCommitment","examTomorrow","alcohol","illness"];
 const storageKey = "sleep-study-checkins-v1";
+let calendarMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+let selectedCalendarDate = today();
 
 function today() { return new Date().toISOString().slice(0,10); }
 $("date").value = today();
@@ -50,6 +52,10 @@ function save() {
   if (index >= 0) all[index] = item; else all.push(item);
   localStorage.setItem(storageKey, JSON.stringify(all));
   $("status").textContent = `${item.date} 기록을 이 기기에 저장했습니다.`;
+  selectedCalendarDate = item.date;
+  calendarMonth = new Date(`${item.date}T00:00:00`);
+  $("calendarPanel").classList.remove("hidden");
+  renderCalendar();
 }
 function csvEscape(value) { const s = String(value ?? ""); return /[",\n]/.test(s) ? `"${s.replaceAll('"','""')}"` : s; }
 function exportCsv() {
@@ -63,6 +69,35 @@ function exportCsv() {
 }
 form.addEventListener("submit", e => { e.preventDefault(); save(); });
 $("export").addEventListener("click", exportCsv);
+$("showCalendar").addEventListener("click", () => {
+  $("calendarPanel").classList.remove("hidden");
+  renderCalendar();
+  $("calendarPanel").scrollIntoView({behavior:"smooth", block:"start"});
+});
+$("prevMonth").addEventListener("click", () => { calendarMonth = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth()-1, 1); renderCalendar(); });
+$("nextMonth").addEventListener("click", () => { calendarMonth = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth()+1, 1); renderCalendar(); });
 form.addEventListener("input", updateSummary);
 form.addEventListener("change", e => { if (e.target.name === "caffeineUsed") toggleCaffeine(); else updateSummary(); });
 toggleCaffeine(); updateSummary();
+
+function isoDate(date) { return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`; }
+function renderCalendar() {
+  const year = calendarMonth.getFullYear(), month = calendarMonth.getMonth();
+  $("monthTitle").textContent = `${year}년 ${month+1}월 기록`;
+  const rows = records(), first = new Date(year, month, 1), lastDay = new Date(year, month+1, 0).getDate();
+  let html = Array(first.getDay()).fill('<button class="calendar-day empty" type="button" tabindex="-1"></button>').join("");
+  for (let day=1; day<=lastDay; day++) {
+    const date = isoDate(new Date(year, month, day));
+    const hasAny = rows.some(row => row.date === date);
+    const selected = date === selectedCalendarDate;
+    html += `<button class="calendar-day${hasAny ? " is-recorded" : ""}${selected ? " is-selected" : ""}${date === today() ? " is-today" : ""}" type="button" data-date="${date}">${day}${hasAny ? " ·" : ""}</button>`;
+  }
+  $("calendar").innerHTML = html;
+  $("calendar").querySelectorAll("[data-date]").forEach(button => button.addEventListener("click", () => { selectedCalendarDate = button.dataset.date; renderCalendar(); }));
+  showSelectedDay(selectedCalendarDate, rows);
+}
+function showSelectedDay(date, rows) {
+  const selected = rows.filter(row => row.date === date);
+  if (!selected.length) { $("selectedDay").innerHTML = `<strong>${date}</strong>에는 저장된 기록이 없습니다.`; return; }
+  $("selectedDay").innerHTML = `<strong>${date}</strong> 저장 완료 · ${selected.map(row => `${row.participant} (${row.savedAt ? new Date(row.savedAt).toLocaleTimeString("ko-KR", {hour:"2-digit",minute:"2-digit"}) : ""})`).join(", ")}`;
+}

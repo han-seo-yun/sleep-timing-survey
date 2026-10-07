@@ -4,15 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0b1220">
-  <title>수면 예측 일지</title>
+  <title>SleepWell 취침전 설문조사</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <main class="shell">
     <header>
-      <p class="eyebrow">SLEEP TIMING STUDY · 20:00 CHECK-IN</p>
-      <h1>오늘 밤 수면 예측 일지</h1>
+      <p class="eyebrow">SLEEPWELL · 20:00 CHECK-IN</p>
+      <h1>SleepWell 취침전 설문조사</h1>
       <p class="intro">20:00 이전 정보만 입력합니다. 내일 아침의 실제 수면 기록은 별도 확인용이며, 오늘 예측에 섞이지 않습니다.</p>
     </header>
 
@@ -26,7 +26,7 @@
         <div class="grid two">
           <label>참여자 코드
             <select id="participant" required>
-              <option value="">선택</option><option>P01</option><option>P02</option><option>P03</option>
+              <option value="">선택</option><option>신혜지</option><option>정채윤</option><option>최소빈</option><option>한서윤</option>
             </select>
           </label>
           <label>예측 기준 날짜
@@ -119,8 +119,18 @@
         <button class="secondary" id="export" type="button">CSV 내보내기</button>
         <button class="primary" type="submit">오늘 기록 저장</button>
       </div>
+      <button class="calendar-button" id="showCalendar" type="button">이번 달 기록 보기</button>
       <p id="status" class="status" role="status"></p>
     </form>
+    <section id="calendarPanel" class="card calendar-panel hidden" aria-live="polite">
+      <div class="calendar-heading">
+        <div><p class="eyebrow">SAVED CHECK-INS</p><h2 id="monthTitle">이번 달 기록</h2></div>
+        <div class="month-nav"><button id="prevMonth" type="button" aria-label="이전 달">‹</button><button id="nextMonth" type="button" aria-label="다음 달">›</button></div>
+      </div>
+      <div class="calendar-weekdays"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>
+      <div id="calendar" class="calendar-grid"></div>
+      <div id="selectedDay" class="selected-day">날짜를 선택하면 기록 상태가 표시됩니다.</div>
+    </section>
   </main>
   <script src="app.js"></script>
 </body>
