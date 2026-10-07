@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1220">
+  <title>수면 예측 일지</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <p class="eyebrow">SLEEP TIMING STUDY · 20:00 CHECK-IN</p>
+      <h1>오늘 밤 수면 예측 일지</h1>
+      <p class="intro">20:00 이전 정보만 입력합니다. 내일 아침의 실제 수면 기록은 별도 확인용이며, 오늘 예측에 섞이지 않습니다.</p>
+    </header>
+
+    <section class="notice" aria-label="작성 안내">
+      <strong>권장 작성 시각</strong><span>매일 20:00 전후 · 약 1분</span>
+    </section>
+
+    <form id="survey" novalidate>
+      <section class="card">
+        <h2>기본 정보</h2>
+        <div class="grid two">
+          <label>참여자 코드
+            <select id="participant" required>
+              <option value="">선택</option><option>P01</option><option>P02</option><option>P03</option>
+            </select>
+          </label>
+          <label>예측 기준 날짜
+            <input id="date" type="date" required>
+          </label>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-heading"><div><h2>카페인</h2><p>오늘 20:00 이전에 섭취한 총량</p></div></div>
+        <div class="chips" role="group" aria-label="카페인 섭취 여부">
+          <label><input type="radio" name="caffeineUsed" value="no" checked> 없음</label>
+          <label><input type="radio" name="caffeineUsed" value="yes"> 섭취함</label>
+        </div>
+        <div id="caffeineDetails" class="grid two hidden">
+          <label>총량 (mg)
+            <input id="caffeineMg" type="number" min="0" max="1000" inputmode="decimal" placeholder="예: 120">
+          </label>
+          <label>마지막 섭취 시각
+            <input id="lastCaffeine" type="time">
+          </label>
+        </div>
+        <p class="hint">대략값도 괜찮습니다: 아메리카노 1잔 약 100–150mg, 에너지음료 1캔 약 80mg.</p>
+      </section>
+
+      <section class="card">
+        <div class="section-heading"><div><h2>낮잠 · 운동 · 피로</h2><p>오늘 20:00 이전 기준</p></div></div>
+        <div class="grid two">
+          <label>낮잠 시간 (분)
+            <input id="napMinutes" type="number" min="0" max="600" inputmode="numeric" value="0">
+          </label>
+          <label>낮잠 종료 시각
+            <input id="napEnd" type="time">
+          </label>
+          <label>운동 시간 (분)
+            <input id="exerciseMinutes" type="number" min="0" max="600" inputmode="numeric" value="0">
+          </label>
+          <label>운동 종료 시각
+            <input id="exerciseEnd" type="time">
+          </label>
+        </div>
+        <fieldset>
+          <legend>오늘 운동 강도</legend>
+          <div class="chips"><label><input type="radio" name="exerciseIntensity" value="none" checked> 안 함</label><label><input type="radio" name="exerciseIntensity" value="light"> 가벼움</label><label><input type="radio" name="exerciseIntensity" value="moderate"> 보통</label><label><input type="radio" name="exerciseIntensity" value="vigorous"> 격함</label></div>
+        </fieldset>
+        <fieldset>
+          <legend>현재 피로도 <output id="fatigueValue">4</output>/7</legend>
+          <input id="fatigue" type="range" min="1" max="7" value="4">
+          <div class="range-labels"><span>매우 맑음</span><span>매우 피곤함</span></div>
+        </fieldset>
+      </section>
+
+      <section class="card">
+        <div class="section-heading"><div><h2>Galaxy Watch 5</h2><p>Samsung Health에서 확인 가능한 오늘의 값</p></div></div>
+        <div class="grid two">
+          <label>현재까지 걸음 수
+            <input id="steps" type="number" min="0" max="100000" inputmode="numeric" placeholder="예: 6500">
+          </label>
+          <label>오늘 평균 심박수 (bpm)
+            <input id="heartRate" type="number" min="25" max="240" inputmode="numeric" placeholder="예: 78">
+          </label>
+        </div>
+        <p class="hint">값을 모르면 비워 두세요. 나중에 Watch 내보내기 자료와 병합할 수 있습니다.</p>
+      </section>
+
+      <section class="card">
+        <h2>내일 일정</h2>
+        <div class="grid two">
+          <label>알람 시각
+            <input id="alarmTime" type="time">
+          </label>
+          <label>첫 의무 일정 시각
+            <input id="firstCommitment" type="time">
+          </label>
+        </div>
+        <fieldset>
+          <legend>특이사항</legend>
+          <div class="chips"><label><input id="examTomorrow" type="checkbox"> 시험·마감</label><label><input id="alcohol" type="checkbox"> 음주</label><label><input id="illness" type="checkbox"> 아픔·컨디션 이상</label></div>
+        </fieldset>
+      </section>
+
+      <section class="card result" aria-live="polite">
+        <p class="eyebrow">입력값 계산</p>
+        <h2>20:00 기준 요약</h2>
+        <div id="summary" class="summary">입력하면 오늘의 모델 입력값을 정리합니다.</div>
+        <p class="hint">이 화면은 연구용 입력·검증 도구입니다. 현재 값만으로 의료적 판단이나 수면 진단을 제공하지 않습니다.</p>
+      </section>
+
+      <div class="actions">
+        <button class="secondary" id="export" type="button">CSV 내보내기</button>
+        <button class="primary" type="submit">오늘 기록 저장</button>
+      </div>
+      <p id="status" class="status" role="status"></p>
+    </form>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
